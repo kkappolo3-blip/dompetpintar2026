@@ -4,10 +4,9 @@
   "env": {
     "NODE_ENV": "production"
   },
-  "rewrites": [
-    {
-      "source": "/:path*",
-      "destination": "/"
+  "functions": {
+    "api/**": {
+      "runtime": "nodejs20.x"
     }
-  ]
+  }
 }
