@@ -14,7 +14,156 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      bills: {
+        Row: {
+          amount: number
+          category: string | null
+          created_at: string
+          device_id: string
+          due_date: string
+          id: string
+          name: string
+          paid: boolean | null
+          recurring: boolean | null
+        }
+        Insert: {
+          amount: number
+          category?: string | null
+          created_at?: string
+          device_id: string
+          due_date: string
+          id?: string
+          name: string
+          paid?: boolean | null
+          recurring?: boolean | null
+        }
+        Update: {
+          amount?: number
+          category?: string | null
+          created_at?: string
+          device_id?: string
+          due_date?: string
+          id?: string
+          name?: string
+          paid?: boolean | null
+          recurring?: boolean | null
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          device_id: string
+          id: string
+          role: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          device_id: string
+          id?: string
+          role: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          device_id?: string
+          id?: string
+          role?: string
+        }
+        Relationships: []
+      }
+      debts: {
+        Row: {
+          created_at: string
+          creditor: string
+          device_id: string
+          id: string
+          notes: string | null
+          priority: number | null
+          remaining: number
+          total_amount: number
+        }
+        Insert: {
+          created_at?: string
+          creditor: string
+          device_id: string
+          id?: string
+          notes?: string | null
+          priority?: number | null
+          remaining: number
+          total_amount: number
+        }
+        Update: {
+          created_at?: string
+          creditor?: string
+          device_id?: string
+          id?: string
+          notes?: string | null
+          priority?: number | null
+          remaining?: number
+          total_amount?: number
+        }
+        Relationships: []
+      }
+      expenses: {
+        Row: {
+          amount: number
+          category: string
+          device_id: string
+          id: string
+          note: string | null
+          spent_at: string
+        }
+        Insert: {
+          amount: number
+          category: string
+          device_id: string
+          id?: string
+          note?: string | null
+          spent_at?: string
+        }
+        Update: {
+          amount?: number
+          category?: string
+          device_id?: string
+          id?: string
+          note?: string | null
+          spent_at?: string
+        }
+        Relationships: []
+      }
+      incomes: {
+        Row: {
+          amount: number
+          created_at: string
+          date_received: string
+          device_id: string
+          id: string
+          name: string
+          recurrence: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          date_received: string
+          device_id: string
+          id?: string
+          name: string
+          recurrence?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          date_received?: string
+          device_id?: string
+          id?: string
+          name?: string
+          recurrence?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
