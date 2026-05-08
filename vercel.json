@@ -1,6 +1,6 @@
 {
   "buildCommand": "npm run build",
-  "outputDirectory": "dist",
+  "outputDirectory": "dist/client",
   "env": {
     "NODE_ENV": "production"
   },
@@ -8,5 +8,15 @@
     "api/**": {
       "runtime": "nodejs20.x"
     }
-  }
+  },
+  "routes": [
+    {
+      "src": "^/api/(.*)$",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "^/(?!api).*$",
+      "dest": "/api/[[...route]].js"
+    }
+  ]
 }
