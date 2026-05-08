@@ -72,13 +72,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Dompet Pintar — Asisten Keuangan Pribadi" },
+      { title: "Dompet Pintar — By Mohamad Khair" },
       { name: "description", content: "Atur cashflow harian, tagihan, hutang & dapatkan saran realistis dari AI." },
-      { property: "og:title", content: "Dompet Pintar" },
-      { property: "og:description", content: "Asisten keuangan pribadi realistis bertenaga AI." },
+      { property: "og:title", content: "Dompet Pintar — By Mohamad Khair" },
+      { property: "og:description", content: "Atur cashflow harian, tagihan, hutang & dapatkan saran realistis dari AI." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Dompet Pintar — By Mohamad Khair" },
+      { name: "twitter:description", content: "Atur cashflow harian, tagihan, hutang & dapatkan saran realistis dari AI." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/b91f5d84-b394-4835-bd2d-60a4934f78cb" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/b91f5d84-b394-4835-bd2d-60a4934f78cb" },
     ],
     links: [
       {
