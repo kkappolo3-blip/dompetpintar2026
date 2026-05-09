@@ -1,19 +1,20 @@
 import { supabase } from "@/integrations/supabase/client";
-import { getDeviceId } from "./device";
 
 export async function fetchAll() {
-  const device_id = getDeviceId();
-  const [incomes, bills, debts, expenses] = await Promise.all([
-    supabase.from("incomes").select("*").eq("device_id", device_id).order("date_received"),
-    supabase.from("bills").select("*").eq("device_id", device_id).order("due_date"),
-    supabase.from("debts").select("*").eq("device_id", device_id).order("priority"),
-    supabase.from("expenses").select("*").eq("device_id", device_id).order("spent_at", { ascending: false }).limit(200),
+  // RLS scopes everything to auth.uid()
+  const [incomes, bills, debts, expenses, receivables] = await Promise.all([
+    supabase.from("incomes").select("*").order("date_received"),
+    supabase.from("bills").select("*").order("due_date"),
+    supabase.from("debts").select("*").order("priority"),
+    supabase.from("expenses").select("*").order("spent_at", { ascending: false }).limit(200),
+    supabase.from("receivables").select("*").order("priority"),
   ]);
   return {
     incomes: incomes.data ?? [],
     bills: bills.data ?? [],
     debts: debts.data ?? [],
     expenses: expenses.data ?? [],
+    receivables: receivables.data ?? [],
   };
 }
 
@@ -32,9 +33,9 @@ export function computeMetrics(data: FinanceData, currentBalance: number) {
   // Bills due before next income (or in next 30 days)
   const horizon = nextIncome ? new Date(nextIncome.date_received) : new Date(Date.now() + 30 * 86400000);
   const upcomingBills = data.bills.filter(
-    (b) => !b.paid && new Date(b.due_date) <= horizon && new Date(b.due_date) >= new Date(today.getTime() - 86400000)
+    (b) => Number(b.paid_amount ?? 0) < Number(b.amount) && new Date(b.due_date) <= horizon && new Date(b.due_date) >= new Date(today.getTime() - 86400000)
   );
-  const billsTotal = upcomingBills.reduce((s, b) => s + Number(b.amount), 0);
+  const billsTotal = upcomingBills.reduce((s, b) => s + Math.max(0, Number(b.amount) - Number(b.paid_amount ?? 0)), 0);
 
   const daysUntilIncome = nextIncome
     ? Math.max(1, Math.round((new Date(nextIncome.date_received).getTime() - today.getTime()) / 86400000))
@@ -44,6 +45,7 @@ export function computeMetrics(data: FinanceData, currentBalance: number) {
   const dailyBudget = availableForDaily / daysUntilIncome;
 
   const totalDebt = data.debts.reduce((s, d) => s + Number(d.remaining), 0);
+  const totalReceivable = (data.receivables ?? []).reduce((s, r) => s + Number(r.remaining), 0);
 
   // last 30d spend
   const monthAgo = new Date(Date.now() - 30 * 86400000);
@@ -62,6 +64,7 @@ export function computeMetrics(data: FinanceData, currentBalance: number) {
     upcomingBills,
     billsTotal,
     totalDebt,
+    totalReceivable,
     monthSpend,
     status,
   };
