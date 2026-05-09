@@ -19,34 +19,40 @@ export type Database = {
           amount: number
           category: string | null
           created_at: string
-          device_id: string
+          device_id: string | null
           due_date: string
           id: string
           name: string
           paid: boolean | null
+          paid_amount: number
           recurring: boolean | null
+          user_id: string | null
         }
         Insert: {
           amount: number
           category?: string | null
           created_at?: string
-          device_id: string
+          device_id?: string | null
           due_date: string
           id?: string
           name: string
           paid?: boolean | null
+          paid_amount?: number
           recurring?: boolean | null
+          user_id?: string | null
         }
         Update: {
           amount?: number
           category?: string | null
           created_at?: string
-          device_id?: string
+          device_id?: string | null
           due_date?: string
           id?: string
           name?: string
           paid?: boolean | null
+          paid_amount?: number
           recurring?: boolean | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -54,23 +60,26 @@ export type Database = {
         Row: {
           content: string
           created_at: string
-          device_id: string
+          device_id: string | null
           id: string
           role: string
+          user_id: string | null
         }
         Insert: {
           content: string
           created_at?: string
-          device_id: string
+          device_id?: string | null
           id?: string
           role: string
+          user_id?: string | null
         }
         Update: {
           content?: string
           created_at?: string
-          device_id?: string
+          device_id?: string | null
           id?: string
           role?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -78,32 +87,35 @@ export type Database = {
         Row: {
           created_at: string
           creditor: string
-          device_id: string
+          device_id: string | null
           id: string
           notes: string | null
           priority: number | null
           remaining: number
           total_amount: number
+          user_id: string | null
         }
         Insert: {
           created_at?: string
           creditor: string
-          device_id: string
+          device_id?: string | null
           id?: string
           notes?: string | null
           priority?: number | null
           remaining: number
           total_amount: number
+          user_id?: string | null
         }
         Update: {
           created_at?: string
           creditor?: string
-          device_id?: string
+          device_id?: string | null
           id?: string
           notes?: string | null
           priority?: number | null
           remaining?: number
           total_amount?: number
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -111,26 +123,29 @@ export type Database = {
         Row: {
           amount: number
           category: string
-          device_id: string
+          device_id: string | null
           id: string
           note: string | null
           spent_at: string
+          user_id: string | null
         }
         Insert: {
           amount: number
           category: string
-          device_id: string
+          device_id?: string | null
           id?: string
           note?: string | null
           spent_at?: string
+          user_id?: string | null
         }
         Update: {
           amount?: number
           category?: string
-          device_id?: string
+          device_id?: string | null
           id?: string
           note?: string | null
           spent_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -139,28 +154,70 @@ export type Database = {
           amount: number
           created_at: string
           date_received: string
-          device_id: string
+          device_id: string | null
           id: string
           name: string
           recurrence: string | null
+          user_id: string | null
         }
         Insert: {
           amount: number
           created_at?: string
           date_received: string
-          device_id: string
+          device_id?: string | null
           id?: string
           name: string
           recurrence?: string | null
+          user_id?: string | null
         }
         Update: {
           amount?: number
           created_at?: string
           date_received?: string
-          device_id?: string
+          device_id?: string | null
           id?: string
           name?: string
           recurrence?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      receivables: {
+        Row: {
+          created_at: string
+          debtor: string
+          device_id: string | null
+          due_date: string | null
+          id: string
+          notes: string | null
+          priority: number | null
+          remaining: number
+          total_amount: number
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          debtor: string
+          device_id?: string | null
+          due_date?: string | null
+          id?: string
+          notes?: string | null
+          priority?: number | null
+          remaining: number
+          total_amount: number
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          debtor?: string
+          device_id?: string | null
+          due_date?: string | null
+          id?: string
+          notes?: string | null
+          priority?: number | null
+          remaining?: number
+          total_amount?: number
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -169,7 +226,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      claim_device_data: { Args: { _device_id: string }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
