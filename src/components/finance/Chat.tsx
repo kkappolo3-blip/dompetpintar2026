@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { getDeviceId } from "@/lib/finance/device";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send, Sparkles, Trash2 } from "lucide-react";
@@ -80,11 +79,14 @@ export function Chat({ data, balance }: { data: FinanceData; balance: number }) 
       }
 
       // persist to db (fire and forget)
-      const dev = getDeviceId();
-      supabase.from("chat_messages").insert([
-        { device_id: dev, role: "user", content: text },
-        { device_id: dev, role: "assistant", content: acc },
-      ]).then(()=>{});
+      const { data: u } = await supabase.auth.getUser();
+      const uid = u.user?.id;
+      if (uid) {
+        supabase.from("chat_messages").insert([
+          { user_id: uid, role: "user", content: text },
+          { user_id: uid, role: "assistant", content: acc },
+        ]).then(()=>{});
+      }
     } catch (e:any) {
       toast.error("Gagal: " + (e?.message ?? "error"));
     } finally {
