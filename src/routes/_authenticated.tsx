@@ -21,9 +21,12 @@ function AuthedLayout() {
     const KEY = "dompet_claimed";
     if (!localStorage.getItem(KEY)) {
       const dev = getDeviceId();
-      supabase.rpc("claim_device_data", { _device_id: dev }).then(() => {
-        localStorage.setItem(KEY, "1");
-      }).catch(() => {});
+      (async () => {
+        try {
+          await supabase.rpc("claim_device_data", { _device_id: dev });
+          localStorage.setItem(KEY, "1");
+        } catch {}
+      })();
     }
     setReady(true);
   }, []);
