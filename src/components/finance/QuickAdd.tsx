@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { getDeviceId } from "@/lib/finance/device";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,7 +9,6 @@ import { toast } from "sonner";
 import { Plus } from "lucide-react";
 
 export function QuickAdd({ onAdded }: { onAdded: () => void }) {
-  const device_id = getDeviceId();
   const [busy, setBusy] = useState(false);
 
   // expense
@@ -34,9 +32,18 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
   const [dbTotal, setDbTotal] = useState("");
   const [dbPrio, setDbPrio] = useState("3");
 
+  // receivable
+  const [rcDebtor, setRcDebtor] = useState("");
+  const [rcTotal, setRcTotal] = useState("");
+  const [rcPrio, setRcPrio] = useState("3");
+  const [rcDate, setRcDate] = useState("");
+
   async function add(table: string, payload: any) {
     setBusy(true);
-    const { error } = await supabase.from(table as any).insert({ device_id, ...payload });
+    const { data: u } = await supabase.auth.getUser();
+    const user_id = u.user?.id;
+    if (!user_id) { setBusy(false); toast.error("Silakan login dulu"); return; }
+    const { error } = await supabase.from(table as any).insert({ user_id, ...payload });
     setBusy(false);
     if (error) return toast.error("Gagal menyimpan: " + error.message);
     toast.success("Tersimpan");
@@ -47,11 +54,12 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
     <div className="bg-gradient-card rounded-2xl border border-border p-5 shadow-card">
       <h2 className="text-lg font-bold mb-3 flex items-center gap-2"><Plus className="size-5 text-primary"/> Catat cepat</h2>
       <Tabs defaultValue="expense">
-        <TabsList className="grid grid-cols-4 w-full">
+        <TabsList className="grid grid-cols-5 w-full">
           <TabsTrigger value="expense">Keluar</TabsTrigger>
           <TabsTrigger value="income">Masuk</TabsTrigger>
           <TabsTrigger value="bill">Tagihan</TabsTrigger>
           <TabsTrigger value="debt">Hutang</TabsTrigger>
+          <TabsTrigger value="receivable">Piutang</TabsTrigger>
         </TabsList>
 
         <TabsContent value="expense" className="space-y-3 pt-3">
@@ -140,6 +148,31 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
             await add("debts",{creditor:dbCred,total_amount:t,remaining:t,priority:Number(dbPrio)});
             setDbCred(""); setDbTotal("");
           }}>Simpan hutang</Button>
+        </TabsContent>
+
+        <TabsContent value="receivable" className="space-y-3 pt-3">
+          <div><Label>Dari (siapa berhutang)</Label><Input value={rcDebtor} onChange={e=>setRcDebtor(e.target.value)} placeholder="Nama teman/keluarga"/></div>
+          <div className="grid grid-cols-2 gap-3">
+            <div><Label>Jumlah</Label><Input inputMode="numeric" value={rcTotal} onChange={e=>setRcTotal(e.target.value.replace(/\D/g,""))}/></div>
+            <div><Label>Tgl janji bayar</Label><Input type="date" value={rcDate} onChange={e=>setRcDate(e.target.value)}/></div>
+          </div>
+          <div>
+            <Label>Prioritas</Label>
+            <Select value={rcPrio} onValueChange={setRcPrio}>
+              <SelectTrigger><SelectValue/></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1">1 - Tagih segera</SelectItem>
+                <SelectItem value="2">2 - Penting</SelectItem>
+                <SelectItem value="3">3 - Normal</SelectItem>
+                <SelectItem value="4">4 - Santai</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <Button disabled={busy||!rcDebtor||!rcTotal} className="w-full" onClick={async()=>{
+            const t=Number(rcTotal);
+            await add("receivables",{debtor:rcDebtor,total_amount:t,remaining:t,priority:Number(rcPrio),due_date:rcDate||null});
+            setRcDebtor(""); setRcTotal(""); setRcDate("");
+          }}>Simpan piutang</Button>
         </TabsContent>
       </Tabs>
     </div>
