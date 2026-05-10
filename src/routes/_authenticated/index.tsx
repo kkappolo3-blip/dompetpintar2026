@@ -10,10 +10,13 @@ import { PaymentPlans } from "@/components/finance/PaymentPlans";
 import { Chat } from "@/components/finance/Chat";
 import { BalanceEditor } from "@/components/finance/BalanceEditor";
 import { Toaster } from "@/components/ui/sonner";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Calendar, Coins, TrendingDown, AlertTriangle, Sparkles, LogOut, Wallet, HandCoins, ChevronDown } from "lucide-react";
+import { Calendar, Coins, TrendingDown, AlertTriangle, Sparkles, LogOut, Wallet, HandCoins, ChevronDown, Receipt, ShoppingBasket, ListChecks } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
+  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
+  SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger,
+} from "@/components/ui/sidebar";
 import { useAuth, signOut } from "@/lib/auth";
 import { useNavigate } from "@tanstack/react-router";
 
@@ -27,6 +30,7 @@ function HomePage() {
   const [data, setData] = useState<FinanceData>({ incomes: [], bills: [], debts: [], expenses: [], receivables: [] });
   const [balance, setBal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [section, setSection] = useState<"bills" | "debts" | "receivables" | "plans" | "expenses">("bills");
 
   const load = useCallback(async () => {
     const d = await fetchAll();
@@ -80,12 +84,19 @@ function HomePage() {
     navigate({ to: "/auth" });
   }
 
-  return (
-    <main className="min-h-screen pb-12">
-      <Toaster richColors theme="dark" position="top-center"/>
+  const sectionTitle: Record<string, string> = {
+    bills: "Tagihan", debts: "Hutang", receivables: "Piutang", plans: "Plan Pembayaran", expenses: "Pengeluaran",
+  };
 
-      <header className="px-4 md:px-8 pt-8 pb-6 max-w-7xl mx-auto">
+  return (
+    <SidebarProvider>
+      <Toaster richColors theme="dark" position="top-center"/>
+      <AppSidebar section={section} onSelect={setSection}/>
+      <main className="min-h-screen pb-12 flex-1 w-full">
+
+      <header className="px-4 md:px-8 pt-6 pb-6 max-w-7xl mx-auto">
         <div className="flex items-center justify-between gap-3">
+          <SidebarTrigger className="md:hidden"/>
           <div>
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight flex items-center gap-2">
               <span className="size-9 rounded-xl bg-gradient-money grid place-items-center shadow-glow">
@@ -218,30 +229,12 @@ function HomePage() {
           <QuickAdd onAdded={load}/>
 
           <div className="bg-gradient-card rounded-2xl border border-border p-5 shadow-card">
-            <Tabs defaultValue="bills">
-              <TabsList className="grid grid-cols-5 w-full">
-                <TabsTrigger value="bills">Tagihan</TabsTrigger>
-                <TabsTrigger value="debts">Hutang</TabsTrigger>
-                <TabsTrigger value="receivables">Piutang</TabsTrigger>
-                <TabsTrigger value="plans">Plan</TabsTrigger>
-                <TabsTrigger value="expenses">Keluar</TabsTrigger>
-              </TabsList>
-              <TabsContent value="bills" className="pt-4">
-                {loading ? <Skeleton/> : <BillsList bills={data.bills} onChange={load}/>}
-              </TabsContent>
-              <TabsContent value="debts" className="pt-4">
-                {loading ? <Skeleton/> : <DebtsList debts={data.debts} onChange={load}/>}
-              </TabsContent>
-              <TabsContent value="receivables" className="pt-4">
-                {loading ? <Skeleton/> : <ReceivablesList items={data.receivables ?? []} onChange={load}/>}
-              </TabsContent>
-              <TabsContent value="plans" className="pt-4">
-                <PaymentPlans/>
-              </TabsContent>
-              <TabsContent value="expenses" className="pt-4">
-                {loading ? <Skeleton/> : <ExpensesList expenses={data.expenses} onChange={load}/>}
-              </TabsContent>
-            </Tabs>
+            <h2 className="text-lg font-bold mb-3">{sectionTitle[section]}</h2>
+            {section === "bills" && (loading ? <Skeleton/> : <BillsList bills={data.bills} onChange={load}/>)}
+            {section === "debts" && (loading ? <Skeleton/> : <DebtsList debts={data.debts} onChange={load}/>)}
+            {section === "receivables" && (loading ? <Skeleton/> : <ReceivablesList items={data.receivables ?? []} onChange={load}/>)}
+            {section === "plans" && <PaymentPlans/>}
+            {section === "expenses" && (loading ? <Skeleton/> : <ExpensesList expenses={data.expenses} onChange={load}/>)}
           </div>
         </div>
 
@@ -249,7 +242,39 @@ function HomePage() {
           <Chat data={data} balance={balance}/>
         </div>
       </div>
-    </main>
+      </main>
+    </SidebarProvider>
+  );
+}
+
+function AppSidebar({ section, onSelect }: { section: string; onSelect: (s: any) => void }) {
+  const items = [
+    { key: "bills", label: "Tagihan", icon: Receipt },
+    { key: "debts", label: "Hutang", icon: TrendingDown },
+    { key: "receivables", label: "Piutang", icon: HandCoins },
+    { key: "plans", label: "Plan", icon: ShoppingBasket },
+    { key: "expenses", label: "Pengeluaran", icon: ListChecks },
+  ];
+  return (
+    <Sidebar collapsible="icon">
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Keuangan</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {items.map((it) => (
+                <SidebarMenuItem key={it.key}>
+                  <SidebarMenuButton isActive={section === it.key} onClick={() => onSelect(it.key)}>
+                    <it.icon className="size-4"/>
+                    <span>{it.label}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+    </Sidebar>
   );
 }
 
