@@ -6,6 +6,7 @@ import { rupiah, dateID, daysUntil } from "@/lib/finance/format";
 import { StatCard } from "@/components/finance/StatCard";
 import { QuickAdd } from "@/components/finance/QuickAdd";
 import { BillsList, DebtsList, ExpensesList, ReceivablesList } from "@/components/finance/Lists";
+import { PaymentPlans } from "@/components/finance/PaymentPlans";
 import { Chat } from "@/components/finance/Chat";
 import { BalanceEditor } from "@/components/finance/BalanceEditor";
 import { Toaster } from "@/components/ui/sonner";
@@ -218,10 +219,11 @@ function HomePage() {
 
           <div className="bg-gradient-card rounded-2xl border border-border p-5 shadow-card">
             <Tabs defaultValue="bills">
-              <TabsList className="grid grid-cols-4 w-full">
+              <TabsList className="grid grid-cols-5 w-full">
                 <TabsTrigger value="bills">Tagihan</TabsTrigger>
                 <TabsTrigger value="debts">Hutang</TabsTrigger>
                 <TabsTrigger value="receivables">Piutang</TabsTrigger>
+                <TabsTrigger value="plans">Plan</TabsTrigger>
                 <TabsTrigger value="expenses">Keluar</TabsTrigger>
               </TabsList>
               <TabsContent value="bills" className="pt-4">
@@ -232,6 +234,9 @@ function HomePage() {
               </TabsContent>
               <TabsContent value="receivables" className="pt-4">
                 {loading ? <Skeleton/> : <ReceivablesList items={data.receivables ?? []} onChange={load}/>}
+              </TabsContent>
+              <TabsContent value="plans" className="pt-4">
+                <PaymentPlans/>
               </TabsContent>
               <TabsContent value="expenses" className="pt-4">
                 {loading ? <Skeleton/> : <ExpensesList expenses={data.expenses} onChange={load}/>}
