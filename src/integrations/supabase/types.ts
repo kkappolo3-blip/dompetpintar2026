@@ -182,6 +182,95 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_plan_items: {
+        Row: {
+          actual_price: number | null
+          created_at: string
+          est_price: number
+          id: string
+          name: string
+          note: string | null
+          plan_id: string
+          position: number
+          qty: number
+          status: string
+          unit: string | null
+          user_id: string
+        }
+        Insert: {
+          actual_price?: number | null
+          created_at?: string
+          est_price?: number
+          id?: string
+          name: string
+          note?: string | null
+          plan_id: string
+          position?: number
+          qty?: number
+          status?: string
+          unit?: string | null
+          user_id: string
+        }
+        Update: {
+          actual_price?: number | null
+          created_at?: string
+          est_price?: number
+          id?: string
+          name?: string
+          note?: string | null
+          plan_id?: string
+          position?: number
+          qty?: number
+          status?: string
+          unit?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_plan_items_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "payment_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_plans: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          planned_for: string | null
+          status: string
+          title: string
+          total_budget: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          planned_for?: string | null
+          status?: string
+          title: string
+          total_budget?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          planned_for?: string | null
+          status?: string
+          title?: string
+          total_budget?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       receivables: {
         Row: {
           created_at: string
